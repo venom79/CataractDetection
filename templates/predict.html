@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>VisionCare | Detect Cataract</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <style>
+      body.dark-mode {
+        background-color: #121212;
+        color: #ffffff;
+      }
+      .dark-mode .card,
+      .dark-mode .navbar,
+      .dark-mode .alert,
+      .dark-mode .form-control {
+        background-color: #1e1e1e;
+        color: #ffffff;
+      }
+      .dark-mode .btn-outline-danger {
+        color: #f8d7da;
+        border-color: #f8d7da;
+      }
+      .toggle-btn {
+        cursor: pointer;
+      }
+      .result-image {
+        max-width: 200px;
+        max-height: 200px;
+        width: 100%;
+        height: auto;
+      }
+      .dark-mode footer {
+        background-color: #1e1e1e !important;
+        color: white;
+      }
+
+      .dark-mode footer a {
+        color: #ddd;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+      }
+      main {
+        flex: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary px-3">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">VisionCare</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarContent"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link text-white" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="/predict">Detect</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="/doctors">Doctors</a>
+            </li>
+          </ul>
+          <button
+            class="btn btn-light btn-sm ms-lg-3 mt-2 mt-lg-0 d-flex align-items-center"
+            onclick="toggleMode()"
+            id="themeToggleBtn"
+          >
+            <i class="bi bi-moon-fill me-2" id="themeIcon"></i> Theme
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <main class="container mt-5" style="max-width: 600px">
+      <h3 class="text-center mb-4">Upload an Eye Image</h3>
+
+      <!-- Model Accuracy -->
+      <div class="alert alert-info text-center">
+        Our AI model is <strong>86.78%</strong> accurate in detecting cataracts.
+      </div>
+
+      <!-- Upload Form -->
+      <form method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+          <input
+            type="file"
+            name="file"
+            accept="image/*"
+            class="form-control"
+            required
+          />
+        </div>
+        <div class="d-grid">
+          <input type="submit" value="Detect" class="btn btn-primary" />
+        </div>
+      </form>
+
+      <!-- Prediction Result -->
+      {% if prediction %}
+      <div class="mt-4 text-center">
+        <h5>Result: {{ prediction }}</h5>
+
+        {% if prediction == "Cataract" %}
+        <div class="alert alert-warning mt-4">
+          Early detection is key — please consult a certified eye specialist.
+          <a href="/doctors" class="btn btn-outline-danger mt-2">
+            Find Eye Doctors
+          </a>
+        </div>
+        {% endif %}
+
+        <img
+          src="{{ url_for('static', filename=image_file) }}"
+          alt="Uploaded Eye Image"
+          class="img-fluid mt-3 rounded result-image"
+        />
+      </div>
+      {% endif %}
+    </main>
+
+    <footer class="bg-primary text-white py-4 mt-5">
+      <div class="container text-center">
+        <div class="row">
+          <div class="col-md-6 mb-3 mb-md-0">
+            <h5>VisionCare</h5>
+            <p class="mb-0">AI-powered Cataract Detection Platform</p>
+          </div>
+          <div class="col-md-6">
+            <h6>Quick Links</h6>
+            <ul class="list-unstyled">
+              <li>
+                <a href="/" class="text-white text-decoration-none">Home</a>
+              </li>
+              <li>
+                <a href="/predict" class="text-white text-decoration-none"
+                  >Detection</a
+                >
+              </li>
+              <li>
+                <a href="/doctors" class="text-white text-decoration-none"
+                  >Doctors</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <hr class="border-white mt-4" />
+        <p class="mb-0">© 2025 VisionCare. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+      function toggleMode() {
+        const isDark = document.body.classList.toggle("dark-mode");
+        localStorage.setItem("darkMode", isDark);
+        updateIcon(isDark);
+      }
+
+      function updateIcon(isDark) {
+        const icon = document.getElementById("themeIcon");
+        if (icon) {
+          icon.classList.toggle("bi-moon-fill", !isDark);
+          icon.classList.toggle("bi-sun-fill", isDark);
+        }
+      }
+
+      window.onload = () => {
+        const isDark = localStorage.getItem("darkMode") === "true";
+        if (isDark) {
+          document.body.classList.add("dark-mode");
+        }
+        updateIcon(isDark);
+      };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
