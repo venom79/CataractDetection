@@ -1,3 +1,5 @@
 __pycache__/
+*.pyc
 static/temp.jpg
-model/cataract_model.keras
+model/*
+.env

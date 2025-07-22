@@ -2,10 +2,32 @@ from flask import Flask, render_template, request
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import numpy as np
+import gdown
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
-model = load_model("./model/cataract_model.keras")
+
+MODEL_PATH = "model/cataract_model.keras"
+GDRIVE_ID = os.getenv("GDRIVE_ID")
+
+def download_model():
+    if not os.path.exists(MODEL_PATH):
+        os.makedirs("model", exist_ok=True)
+        url = f"https://drive.google.com/uc?id={GDRIVE_ID}"
+        print("Downloading model from Google Drive...")
+        gdown.download(url, MODEL_PATH, quiet=False)
+    else:
+        print("Model already exists. Skipping download.")
+
+
+# Download model if missing
+download_model()
+
+
+
+model = load_model(MODEL_PATH)
 
 # Home Page
 @app.route("/")
